@@ -16,7 +16,6 @@ from configs.training_config import config as training_config
 
 # 데이터 전처리
 transform = transforms.Compose([
-    transforms.Grayscale(num_output_channels=1),
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.5], std=[0.5])
@@ -50,7 +49,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=training_config.TRAIN.LR)
 
 # 학습 루프
-num_epochs = 10
+num_epochs = 2
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 
@@ -59,8 +58,6 @@ for epoch in range(num_epochs):
     running_loss = 0.0
 
     for images, labels in train_loader:
-
-        print(labels)
         images = images.to(device)
         labels = labels.to(device)
 
@@ -94,3 +91,7 @@ for epoch in range(num_epochs):
 
         accuracy = 100 * correct / total
         print(f"Validation Accuracy: {accuracy:.2f}%")
+
+# 학습이 완료된 후 모델 가중치 저장
+torch.save(model.state_dict(), 'model_weights.pth')
+print("Model weights saved successfully.")
