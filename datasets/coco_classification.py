@@ -36,7 +36,7 @@ class COCOClassificationDataset(Dataset):
                 annotations.append(annotation)
 
         if len(annotations) == 0:
-            print(f"어노테이션 없음 -> img_info: {img_info}, annotations: {annotations}")
+            print(f"\n어노테이션 없음 -> img_info: {img_info}, annotations: {annotations}")
             # 어노테이션이 없는 경우 다음 이미지로 이동
             idx = (idx + 1) % len(self)
             return self.__getitem__(idx)

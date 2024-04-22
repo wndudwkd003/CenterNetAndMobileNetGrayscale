@@ -14,6 +14,9 @@ from datasets.coco_classification import COCOClassificationDataset
 
 from configs.training_config import config as training_config
 
+
+from tqdm import tqdm
+
 # 데이터 전처리
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
@@ -57,7 +60,8 @@ for epoch in range(num_epochs):
     model.train()
     running_loss = 0.0
 
-    for images, labels in train_loader:
+    progress_bar = tqdm(train_loader, desc=f"Epoch [{epoch + 1}/{num_epochs}]", unit="batch")
+    for images, labels in progress_bar:
         images = images.to(device)
         labels = labels.to(device)
 
@@ -71,8 +75,12 @@ for epoch in range(num_epochs):
 
         running_loss += loss.item()
 
+        # 진행 바 업데이트
+        progress_bar.set_postfix({"Loss": loss.item()})
+
+
     epoch_loss = running_loss / len(train_loader)
-    print(f"Epoch [{epoch + 1}/{num_epochs}], Loss: {epoch_loss:.4f}")
+    print(f"Epoch [{epoch + 1}/{num_epochs}], Average Loss: {epoch_loss:.4f}")
 
     # 검증
     model.eval()
