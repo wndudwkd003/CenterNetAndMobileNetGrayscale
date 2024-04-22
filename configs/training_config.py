@@ -21,6 +21,10 @@ config.TRAIN.BATCH_SIZE = 32
 config.TRAIN.LR = 0.001
 
 
+config.DEBUG = easydict.EasyDict()
+config.DEBUG.DEBUG_PRINT = False
+
+
 
 
 

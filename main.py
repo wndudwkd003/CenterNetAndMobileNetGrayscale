@@ -14,7 +14,6 @@ from datasets.coco_classification import COCOClassificationDataset
 
 from configs.training_config import config as training_config
 
-
 from tqdm import tqdm
 
 # 데이터 전처리
@@ -51,10 +50,21 @@ val_loader = DataLoader(val_dataset, batch_size=training_config.TRAIN.BATCH_SIZE
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=training_config.TRAIN.LR)
 
-# 학습 루프
-num_epochs = 2
+# GPU 사용 설정
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
+
+print(f"Using device: {device}")
+
+if torch.cuda.is_available():
+    print("GPU is available.")
+    print(f"GPU device name: {torch.cuda.get_device_name(0)}")
+    print(f"GPU device count: {torch.cuda.device_count()}")
+else:
+    print("GPU is not available. Using CPU instead.")
+
+# 학습 루프
+num_epochs = 2
 
 for epoch in range(num_epochs):
     model.train()
@@ -77,7 +87,6 @@ for epoch in range(num_epochs):
 
         # 진행 바 업데이트
         progress_bar.set_postfix({"Loss": loss.item()})
-
 
     epoch_loss = running_loss / len(train_loader)
     print(f"Epoch [{epoch + 1}/{num_epochs}], Average Loss: {epoch_loss:.4f}")
