@@ -16,7 +16,6 @@ from configs.training_config import config as training_config
 
 from tqdm import tqdm
 
-
 ##############################################################################################
 # 데이터 전처리
 resize = training_config.TRANSFORM.RESIZE
@@ -27,7 +26,6 @@ transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize(mean=[mean], std=[std])
 ])
-
 
 ##############################################################################################
 # 데이터셋 경로
@@ -50,7 +48,6 @@ val_dataset = COCOClassificationDataset(root_dir=val_dir,
 train_loader = DataLoader(train_dataset, batch_size=training_config.TRAIN.BATCH_SIZE, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=training_config.TRAIN.BATCH_SIZE)
 
-
 ##############################################################################################
 # 모델 생성
 num_classes = training_config.DATASET.NUM_CLASSES
@@ -72,7 +69,6 @@ if torch.cuda.is_available():
     print(f"GPU device count: {torch.cuda.device_count()}")
 else:
     print("GPU is not available. Using CPU instead.")
-
 
 ##############################################################################################
 # 학습 루프
@@ -121,8 +117,7 @@ for epoch in range(num_epochs):
         accuracy = 100 * correct / total
         print(f"\nValidation Accuracy: {accuracy:.2f}%")
 
-
 ##############################################################################################
 # 학습이 완료된 후 모델 가중치 저장
-torch.save(model.state_dict(), 'models/classification/model_weights.pth')
+torch.save(model.state_dict(), training_config.WEIGHT.SAVE_PATH)
 print("\nModel weights saved successfully.")
