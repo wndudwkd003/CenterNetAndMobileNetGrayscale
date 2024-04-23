@@ -6,13 +6,19 @@ import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 
+from configs.mobilenet_config import config as mobilenet_config
+
 
 # 모바일넷 V1 백본 수정
 class MobileNetV1BackboneGray(nn.Module):
     def __init__(self, num_classes=12):
         super(MobileNetV1BackboneGray, self).__init__()
 
-        self.model = self.backbone_v1_0()
+        # lightweight: 경량화 모델을 쓸건지
+        if mobilenet_config.BACKBONE.LIGHTWEIGHT:
+            self.model = self.backbone_v1_1()
+        else:
+            self.model = self.backbone_v1_0()
 
         self.avg = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(1024, num_classes)
