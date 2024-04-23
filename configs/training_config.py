@@ -1,7 +1,7 @@
 import easydict
 import os
 
-from mobilenet_config import config as mobilenet_config
+from .mobilenet_config import config as mobilenet_config
 
 config = easydict.EasyDict()
 

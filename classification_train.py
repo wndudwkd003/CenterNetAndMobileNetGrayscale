@@ -13,8 +13,19 @@ from core.MobileNet.mobile_net import MobileNetV1BackboneGray
 from datasets.coco_classification import COCOClassificationDataset
 
 from configs.training_config import config as training_config
+from configs.mobilenet_config import config as mobilenet_config
 
 from tqdm import tqdm
+
+##############################################################################################
+# 현재 설정 출력
+print(f"모바일넷 백본 경량화 선택: {mobilenet_config.BACKBONE.LIGHTWEIGHT}")
+print(f"학습 구분 선택: {training_config.TYPE.TRAIN_TYPE}")
+print(f"train 데이터셋 경로: {training_config.DATASET.TRAIN_PATH}")
+print(f"valid 데이터셋 경로: {training_config.DATASET.VALID_PATH}")
+print(f"epoch 선택: {training_config.TRAIN.EPOCH}")
+print(f"learning rate 선택: {training_config.TRAIN.LR}")
+
 
 ##############################################################################################
 # 데이터 전처리
@@ -100,10 +111,13 @@ for epoch in range(num_epochs):
     print(f"Epoch [{epoch + 1}/{num_epochs}], Average Loss: {epoch_loss:.4f}")
 
     # 검증
+
     model.eval()
     with torch.no_grad():
         correct = 0
         total = 0
+
+        progress_bar = tqdm(val_loader, desc="Validation", unit="batch")
         for images, labels in val_loader:
             images = images.to(device)
             labels = labels.to(device)
@@ -115,7 +129,10 @@ for epoch in range(num_epochs):
             correct += (predicted == labels).sum().item()
 
         accuracy = 100 * correct / total
-        print(f"\nValidation Accuracy: {accuracy:.2f}%")
+        progress_bar.set_postfix({"Accuracy": f"{accuracy:.2f}%"})
+
+    accuracy = 100 * correct / total
+    print(f"\nValidation Accuracy: {accuracy:.2f}%")
 
 ##############################################################################################
 # 학습이 완료된 후 모델 가중치 저장
