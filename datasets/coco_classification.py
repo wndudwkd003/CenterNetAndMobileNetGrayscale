@@ -49,5 +49,6 @@ class COCOClassificationDataset(Dataset):
         areas = [anno['area'] for anno in annotations]
         max_area_idx = areas.index(max(areas))
         category_id = annotations[max_area_idx]['category_id']
+        category_id -= 1
 
         return image, category_id
