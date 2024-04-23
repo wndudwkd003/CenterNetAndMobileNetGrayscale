@@ -72,7 +72,7 @@ optimizer = optim.Adam(model.parameters(), lr=training_config.TRAIN.LR)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 
-print(f"Using device: {device}")
+print(f"\nUsing device: {device}")
 
 if torch.cuda.is_available():
     print("GPU is available.")

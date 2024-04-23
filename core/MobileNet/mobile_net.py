@@ -17,11 +17,12 @@ class MobileNetV1BackboneGray(nn.Module):
         # lightweight: 경량화 모델을 쓸건지
         if mobilenet_config.BACKBONE.LIGHTWEIGHT:
             self.model = self.backbone_v1_1()
+            self.avg = nn.AdaptiveAvgPool2d((1, 1))
+            self.fc = nn.Linear(512, num_classes)
         else:
             self.model = self.backbone_v1_0()
-
-        self.avg = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(1024, num_classes)
+            self.avg = nn.AdaptiveAvgPool2d((1, 1))
+            self.fc = nn.Linear(1024, num_classes)
 
     def forward(self, x):
         x = self.model(x)
