@@ -111,7 +111,6 @@ for epoch in range(num_epochs):
     print(f"Epoch [{epoch + 1}/{num_epochs}], Average Loss: {epoch_loss:.4f}")
 
     # 검증
-
     model.eval()
     with torch.no_grad():
         correct = 0
@@ -128,8 +127,8 @@ for epoch in range(num_epochs):
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
 
-        accuracy = 100 * correct / total
-        progress_bar.set_postfix({"Accuracy": f"{accuracy:.2f}%"})
+            accuracy = 100 * correct / total
+            progress_bar.set_postfix({"Accuracy": f"{accuracy:.2f}%"})
 
     accuracy = 100 * correct / total
     print(f"\nValidation Accuracy: {accuracy:.2f}%")
