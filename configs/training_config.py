@@ -9,7 +9,7 @@ config = easydict.EasyDict()
 # 학습 종류
 config.TYPE = easydict.EasyDict()
 TRAIN_TYPE = ["CLASSIFICATION", "OBJECT_DETECTION"]
-TYPE = 0
+TYPE = 1
 config.TYPE.TRAIN_TYPE = TRAIN_TYPE[TYPE]
 
 ##############################################################################################
