@@ -22,6 +22,9 @@ class CenterNetLoss(nn.Module):
         pos_mask = target == 1
         neg_mask = target < 1
 
+        print(f"focal_loss-> {len(pred)}, {len(target)}")
+        print(f"pos_mask-> pos_mask: {pos_mask.shape}, neg_mask: {neg_mask.shape}")
+        print(f"pos_mask-> pos_mask: {pos_mask.size()}, neg_mask: {neg_mask.size()}")
         pos_loss = -self.alpha * (1 - pred) ** self.beta * torch.log(pred + self.epsilon) * pos_mask
         neg_loss = -(1 - self.alpha) * pred ** self.beta * torch.log(1 - pred + self.epsilon) * neg_mask
 
@@ -44,12 +47,15 @@ class CenterNetLoss(nn.Module):
 
     # 최종 손실 함수는 위의 세가지 손실의 가중 합으로 계산
     def forward(self, predictions, targets):
-        pred_heatmap, pred_sizes, pred_offsets = predictions
-        target_heatmap, target_sizes, target_offsets, size_mask, offset_mask = targets
+        pred_heatmap, pred_offsets, pred_sizes = predictions
+        target_heatmap, target_offsets, target_sizes, offset_mask, size_mask = targets
+
+        print(f"pred_heatmap: {len(pred_heatmap)}, target_heatmap: {len(target_heatmap)}")
+        print(f"pred_heatmap: {pred_heatmap.shape}, target_heatmap: {target_heatmap.shape}")
 
         hm_loss = self.heatmap_loss(pred_heatmap, target_heatmap)
-        sz_loss = self.size_loss(pred_sizes, target_sizes, size_mask)
         off_loss = self.offset_loss(pred_offsets, target_offsets, offset_mask)
+        sz_loss = self.size_loss(pred_sizes, target_sizes, size_mask)
 
         total_loss = hm_loss + self.lambda_size * sz_loss + self.lambda_offset * off_loss
         return total_loss

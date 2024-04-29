@@ -33,7 +33,14 @@ class CenterNet(nn.Module):
         else:
             self.head = CenterNetHead(1024, num_classes)
 
+        # 히트맵 업샘플링 레이어 추가
+        self.heatmap_upsample = nn.Upsample(scale_factor=8, mode='bilinear', align_corners=True)
+
     def forward(self, x):
         features = self.backbone.model(x)
         heatmap, offset, size = self.head(features)
+
+        # 히트맵, 오프셋, 크기 증가
+        heatmap = self.heatmap_upsample(heatmap)
+
         return heatmap, offset, size

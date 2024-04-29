@@ -22,13 +22,20 @@ from tqdm import tqdm
 
 
 def custom_collate(batch):
+    max_size = tuple(max(s) for s in zip(*[item['offsets'].shape for _, item in batch]))
     max_len = max(len(item['sizes']) for _, item in batch)
+
     for _, item in batch:
         pad_len = max_len - len(item['sizes'])
         item['sizes'] = torch.cat([item['sizes'], torch.zeros(pad_len, 2)], dim=0)
-        item['offsets'] = torch.cat([item['offsets'], torch.zeros(pad_len, 2)], dim=0)
+
+        pad_h = max_size[1] - item['offsets'].shape[1]
+        pad_w = max_size[2] - item['offsets'].shape[2]
+        item['offsets'] = torch.nn.functional.pad(item['offsets'], (0, pad_w, 0, pad_h), value=0)
+
         item['size_mask'] = torch.cat([item['size_mask'], torch.zeros(pad_len)], dim=0)
         item['offset_mask'] = torch.cat([item['offset_mask'], torch.zeros(pad_len)], dim=0)
+
     return default_collate(batch)
 
 
@@ -108,17 +115,28 @@ for epoch in range(num_epochs):
     for images, targets in progress_bar:
         images = images.to(device)
         target_heatmap = targets['heatmap'].to(device)
-        target_sizes = targets['sizes'].to(device)
         target_offsets = targets['offsets'].to(device)
-        target_size_mask = targets['size_mask'].to(device)
+        target_sizes = targets['sizes'].to(device)
         target_offset_mask = targets['offset_mask'].to(device)
+        target_size_mask = targets['size_mask'].to(device)
+        targets = (target_heatmap, target_offsets, target_sizes, target_offset_mask, target_size_mask)
 
         # 모델 예측
         predictions = model(images)
+        pred_heatmap, pred_offsets, pred_sizes = predictions
+
+        # pred_heatmap과 target_heatmap의 크기 출력
+        print(f"pred_heatmap shape: {pred_heatmap.shape}")
+        print(f"target_heatmap shape: {target_heatmap.shape}")
+
+        print(f"pred_offsets shape: {pred_offsets.shape}")
+        print(f"target_offsets shape: {target_heatmap.shape}")
+
+        print(f"pred_sizes shape: {pred_sizes.shape}")
+        print(f"target_sizes shape: {target_heatmap.shape}")
 
         # 손실 계산
-        loss = criterion(predictions,
-                         (target_heatmap, target_sizes, target_offsets, target_size_mask, target_offset_mask))
+        loss = criterion(predictions, targets)
 
         # 역전파
         optimizer.zero_grad()

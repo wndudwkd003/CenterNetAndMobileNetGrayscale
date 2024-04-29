@@ -66,7 +66,7 @@ class COCODetectionDataset(Dataset):
 
         # 이미지 내의 각 객체(어노테이션)의 바운딩 박스 크기를 저장함. 정규화된 너비와 높이를 의미함
         sizes = np.zeros((annotations_num, 2), dtype=np.float32)
-        offsets = np.zeros((annotations_num, 2), dtype=np.float32)
+        offsets = np.zeros((2, image_h // self.output_stride, image_w // self.output_stride), dtype=np.float32)
 
         # 각 마스크는 유효한 크기와 오프셋 값이 있는지를 나타내며 손실 계산에서 사용됨. 이는 모델이 불필요한 위치에서 손실을 계산하는 것을 방지함
         # 각 바운딩 박스의 크기가 0보다 큰 경우 유효한 것으로 간주, 이는 각 객체의 크기 정보가 실제로 존재한다는 것을 의미함
@@ -89,8 +89,8 @@ class COCODetectionDataset(Dataset):
 
             heatmap[anno['category_id'] - 1, grid_y, grid_x] = 1
             sizes[i] = [w / image_w, w / image_h]
-            offsets[i] = [(cx - grid_x * self.output_stride) / self.output_stride,
-                          (cy - grid_y * self.output_stride) / self.output_stride]
+            offsets[0, grid_y, grid_x] = (cx - grid_x * self.output_stride) / self.output_stride
+            offsets[1, grid_y, grid_x] = (cy - grid_y * self.output_stride) / self.output_stride
             size_mask[i] = 1 if w > 0 and h > 0 else 0
             offset_mask[i] = 1 if w > 0 and h > 0 else 0
 
